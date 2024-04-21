@@ -1,4 +1,4 @@
-package br.com.sysmap.bootcamp.domain.respository;
+package br.com.sysmap.bootcamp.domain.repository;
 
 import br.com.sysmap.bootcamp.domain.entities.Users;
 import org.springframework.data.jpa.repository.JpaRepository;

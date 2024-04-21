@@ -1,7 +1,8 @@
 package br.com.sysmap.bootcamp.domain.service;
 
 import br.com.sysmap.bootcamp.domain.entities.Users;
-import br.com.sysmap.bootcamp.domain.respository.UsersRepository;
+import br.com.sysmap.bootcamp.domain.repository.UsersRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -14,22 +15,18 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class UsersService implements UserDetailsService {
 
-    @Autowired
     private UsersRepository usersRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Users> userDetail = usersRepository.findByEmail(username);
-
-        return userDetail.map(users -> new User(users.getEmail(), users.getPassword(), new ArrayList<GrantedAuthority>()))
-                .orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
+        Users users = findByEmail(username);
+        return new User(users.getEmail(), users.getPassword(), new ArrayList<GrantedAuthority>());
     }
 
     public Users findByEmail(String username) {
-        return usersRepository.findByEmail(username).orElse(null);
+        return usersRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
     }
-
-
 }
