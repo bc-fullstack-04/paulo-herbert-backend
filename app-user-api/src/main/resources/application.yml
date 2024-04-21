@@ -1,9 +1,6 @@
 spring:
   application:
     name: Bootcamp Sysmap 2024 - Paulo Herbert
-    main:
-      allow-bean-definition-overriding: true
-      allow-circular-references: true
   profiles:
     active: local
 

@@ -5,7 +5,13 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
     defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
   datasource:
     url: jdbc:postgresql://localhost:5432/bootcamp
     username: bootcamp
     password: bootcamppass
+app:
+  spotify:
+    CLIENT_ID: 68ba5a78a85b48b9856d1d2c3deccc89
+    CLIENT_SECRET: e404aac43bbe42bca91d9664d2c1ba35
