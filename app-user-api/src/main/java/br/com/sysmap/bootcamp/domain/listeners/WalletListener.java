@@ -2,7 +2,7 @@ package br.com.sysmap.bootcamp.domain.listeners;
 
 
 import br.com.sysmap.bootcamp.domain.service.WalletService;
-import br.com.sysmap.bootcamp.dto.WalletDto;
+import br.com.sysmap.bootcamp.dto.WalletOperationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -13,13 +13,11 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 @RabbitListener(queues = "WalletQueue")
 public class WalletListener {
 
-
     private final WalletService walletService;
 
     @RabbitHandler
-    public void receive(WalletDto walletDto) {
+    public void receive(WalletOperationDto walletDto) {
         walletService.debit(walletDto);
-        log.info("debiting wallet: {}", walletDto);
     }
 
 

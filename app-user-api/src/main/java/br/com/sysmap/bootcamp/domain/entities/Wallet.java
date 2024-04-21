@@ -9,8 +9,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "wallets")
+@Builder
 public class Wallet {
 
     @Id
@@ -34,11 +37,11 @@ public class Wallet {
     private Long points;
 
     @Column( name = "last_update")
+    @UpdateTimestamp
     private LocalDateTime lastUpdate;
 
     @OneToOne
     @JoinColumn( name = "user_id")
     private Users users;
-
 
 }
