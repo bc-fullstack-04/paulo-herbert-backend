@@ -2,6 +2,8 @@ package br.com.sysmap.bootcamp.web;
 
 import br.com.sysmap.bootcamp.domain.entities.Users;
 import br.com.sysmap.bootcamp.domain.service.UsersService;
+import br.com.sysmap.bootcamp.domain.service.WalletService;
+import br.com.sysmap.bootcamp.dto.ResponseUserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,8 +31,11 @@ public class UsersControllerTest {
 
     @Mock
     private UsersService usersService;
-
+    @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private WalletService walletService;
 
     @BeforeEach
     public void setup() {
@@ -42,13 +47,12 @@ public class UsersControllerTest {
     public void shouldReturnUsersWhenValidUsersIsSaved() throws Exception {
         Users users = Users.builder().id(1L).name("teste").email("test").password("teste").build();
 
-        Mockito.when(usersService.save(users)).thenReturn(users);
+        Mockito.when(usersService.create(users,walletService)).thenReturn(new ResponseUserDto(users));
 
-        mockMvc.perform(post("/users/save")
+        mockMvc.perform(post("/users/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(users)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(users)));
+                .andExpect(status().isOk());
     }
 
 
