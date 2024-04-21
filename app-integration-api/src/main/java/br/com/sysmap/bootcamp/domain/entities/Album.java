@@ -1,18 +1,8 @@
 package br.com.sysmap.bootcamp.domain.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -21,31 +11,32 @@ import java.math.BigDecimal;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "album")
+@Table(name = "albums")
 public class Album {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", updatable = false, nullable = false)
+    @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @Column(name = "NAME", nullable = false, length = 150)
+    @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "ID_SPOTIFY", nullable = false, length = 100)
+    @Column(name = "id_spotify", nullable = false, length = 100,unique = true)
     private String idSpotify;
 
-    @Column(name = "ARTIST_NAME", nullable = false, length = 150)
+    @Column(name = "artist_name", nullable = false, length = 150)
     private String artistName;
 
-    @Column(name = "IMAGE_URL", nullable = false, length = 150)
+    @Column(name = "image_url", nullable = false, length = 150)
     private String imageUrl;
 
-    @Column(name = "VALUE", nullable = false)
+    @Column(name = "value", nullable = false)
     private BigDecimal value;
 
     @ManyToOne
-    @JoinColumn(name = "ID_USER")
+    @JoinColumn(name = "id_user")
+    @JsonIgnore
     private Users users;
 
 }

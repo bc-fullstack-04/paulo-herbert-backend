@@ -15,9 +15,10 @@ public class AlbumModel {
 
     private AlbumType albumType;
     private ArtistSimplified[] artists;
-    private ExternalUrl externalUrl;
+    private ExternalUrl externalUrls;
     private String id;
     private Image[] images;
+    private String name;
     private String releaseDate;
     private ModelObjectType type;
     private BigDecimal value;
