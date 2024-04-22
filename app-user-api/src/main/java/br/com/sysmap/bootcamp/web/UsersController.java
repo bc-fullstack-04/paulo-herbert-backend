@@ -6,6 +6,7 @@ import br.com.sysmap.bootcamp.domain.service.WalletService;
 import br.com.sysmap.bootcamp.dto.RequestAuthDto;
 import br.com.sysmap.bootcamp.dto.ResponseAuthDto;
 import br.com.sysmap.bootcamp.dto.ResponseUserDto;
+import br.com.sysmap.bootcamp.dto.UserRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +25,7 @@ public class UsersController {
 
     @Operation(summary = "Save user")
     @PostMapping("/create")
-    public ResponseEntity<ResponseUserDto> save(@RequestBody Users user) {
+    public ResponseEntity<ResponseUserDto> save(@RequestBody UserRequestDto user) {
         return ResponseEntity.ok(this.usersService.create(user,walletService));
     }
 
@@ -34,7 +35,7 @@ public class UsersController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponseUserDto> update(@RequestBody Users user) {
+    public ResponseEntity<ResponseUserDto> update(@RequestBody UserRequestDto user) {
         return ResponseEntity.ok(usersService.update(user));
     }
 

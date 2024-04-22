@@ -7,6 +7,8 @@ import br.com.sysmap.bootcamp.domain.repository.UsersRepository;
 import br.com.sysmap.bootcamp.dto.RequestAuthDto;
 import br.com.sysmap.bootcamp.dto.ResponseAuthDto;
 import br.com.sysmap.bootcamp.dto.ResponseUserDto;
+import br.com.sysmap.bootcamp.dto.UserRequestDto;
+import br.com.sysmap.bootcamp.exceptions.IllegalArgsRequestException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,47 +40,48 @@ public class UsersService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public ResponseUserDto create(Users user, @Autowired WalletService walletService) {
-        Optional<Users> usersOptional = usersRepository.findByEmail(user.getEmail());
+    public ResponseUserDto create(UserRequestDto userDto, @Autowired WalletService walletService) {
+        Optional<Users> usersOptional = usersRepository.findByEmail(userDto.getEmail());
         if (usersOptional.isPresent()) {
-            throw new RuntimeException("User already exists");
+            throw new IllegalArgsRequestException("User with email " + userDto.getEmail() + " already exists");
         }
-        user = user.toBuilder().password(passwordEncoder.encode(user.getPassword())).build();
-        user = usersRepository.save(user);
-        log.info("Saving user: {}", user);
-        Wallet wallet = walletService.saveWallet(Wallet.builder().balance(BigDecimal.valueOf(100)).points(0L).users(user).build());
+        Users userEntity = Users.builder().name(userDto.getEmail())
+                .password(passwordEncoder.encode(userDto.getPassword())).email(userDto.getEmail()).build();
+        userEntity = usersRepository.save(userEntity);
+        log.info("Saving user: {}",userEntity );
+        Wallet wallet = walletService.saveWallet(Wallet.builder().balance(BigDecimal.valueOf(100)).points(0L).users(userEntity).build());
         log.info("Creating wallet: {}",wallet);
-        return new ResponseUserDto(user);
+        return new ResponseUserDto(userEntity);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public ResponseUserDto update(Users user) {
+    public ResponseUserDto update(UserRequestDto userDto) {
         Users loggedUser = getLoggedUser();
-        if(isEmailAlreadyRegistered(loggedUser,user)){
-            throw new RuntimeException("Already Registered");
+        if(isEmailAlreadyRegistered(loggedUser,userDto)){
+            throw new IllegalArgsRequestException("User with email " + userDto.getEmail() + " already exists");
         }
         log.info("Updating user: {}", loggedUser);
-        return new ResponseUserDto(loggedUser.toBuilder()
-                .name(user.getName()).email(user.getEmail())
-                .password(passwordEncoder.encode(user.getPassword())).build());
+        return new ResponseUserDto(usersRepository.save(loggedUser.toBuilder()
+                .name(userDto.getName()).email(userDto.getEmail())
+                .password(passwordEncoder.encode(userDto.getPassword())).build()));
     }
 
-    public boolean isEmailAlreadyRegistered(Users loggedUser, Users user){
-        Optional<Users> usersOptional = usersRepository.findByEmail(user.getEmail());
+    private boolean isEmailAlreadyRegistered(Users loggedUser, UserRequestDto userDto){
+        Optional<Users> usersOptional = usersRepository.findByEmail(userDto.getEmail());
         if(usersOptional.isEmpty())
             return false;
         return !usersOptional.get().getEmail().equals(loggedUser.getEmail());
+    }
+
+    public Users getLoggedUser() {
+        String loggedUserName = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return this.usersRepository.findByEmail(loggedUserName).orElseThrow();
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Users user = findByEmail(username);
         return new User(user.getEmail(), user.getPassword(), new ArrayList<GrantedAuthority>());
-    }
-
-    public Users getLoggedUser() {
-        String loggedUserName = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return this.usersRepository.findByEmail(loggedUserName).orElseThrow();
     }
 
     public Users findByEmail(String email) {
