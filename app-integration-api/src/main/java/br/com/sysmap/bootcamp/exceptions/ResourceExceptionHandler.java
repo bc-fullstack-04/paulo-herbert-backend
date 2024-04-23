@@ -5,8 +5,10 @@ import br.com.sysmap.bootcamp.exceptions.customs.InvalidCredentials;
 import br.com.sysmap.bootcamp.exceptions.customs.StandardError;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -33,5 +35,16 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new StandardError(Instant.now(),HttpStatus.BAD_REQUEST.value(), "Illegal Argument in Request", e.getMessage(), http.getRequestURI())
         );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<StandardError> validationException(MethodArgumentNotValidException exc){
+        StringBuilder sb = new StringBuilder();
+        exc.getBindingResult().getFieldErrors().
+                forEach(x->sb.append(String.format("[%s: %s], ",x.getField(),x.getDefaultMessage())));
+
+        StandardError error = new StandardError(Instant.now(),HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Validation Exception",sb.toString(),http.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
     }
 }

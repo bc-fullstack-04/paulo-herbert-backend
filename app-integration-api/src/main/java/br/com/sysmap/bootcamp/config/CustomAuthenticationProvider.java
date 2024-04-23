@@ -26,15 +26,9 @@ import java.time.Instant;
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private final UsersService userDetailsService;
-    private final ObjectMapper objectMapper;
-    private final HttpServletRequest req;
-    private final HttpServletResponse res;
 
     public CustomAuthenticationProvider(UsersService userDetailsService, ObjectMapper objectMapper, HttpServletRequest req, HttpServletResponse res) {
         this.userDetailsService = userDetailsService;
-        this.objectMapper = objectMapper;
-        this.req = req;
-        this.res = res;
     }
 
     @Override

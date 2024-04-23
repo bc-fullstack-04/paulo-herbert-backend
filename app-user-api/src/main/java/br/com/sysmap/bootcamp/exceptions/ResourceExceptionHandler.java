@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -40,5 +41,16 @@ public class ResourceExceptionHandler {
     public ResponseEntity<StandardError> handleBadCredentialsException(InvalidCredentials e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                 new StandardError(Instant.now(),HttpStatus.UNAUTHORIZED.value(), "Invalid credentials", e.getMessage(), http.getRequestURI()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<StandardError> validationException(MethodArgumentNotValidException exc){
+        StringBuilder sb = new StringBuilder();
+        exc.getBindingResult().getFieldErrors().
+                forEach(x->sb.append(String.format("[%s: %s], ",x.getField(),x.getDefaultMessage())));
+
+        StandardError error = new StandardError(Instant.now(),HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Validation Exception",sb.toString(),http.getRequestURI());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
     }
 }
