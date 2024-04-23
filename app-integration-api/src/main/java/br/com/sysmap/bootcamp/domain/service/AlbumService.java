@@ -5,6 +5,7 @@ import br.com.sysmap.bootcamp.domain.entities.Users;
 import br.com.sysmap.bootcamp.domain.model.AlbumModel;
 import br.com.sysmap.bootcamp.domain.repository.AlbumRepository;
 import br.com.sysmap.bootcamp.domain.service.integration.SpotifyApiService;
+import br.com.sysmap.bootcamp.dto.RequestAlbumDto;
 import br.com.sysmap.bootcamp.dto.WalletOperationDto;
 import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,17 +45,23 @@ public class AlbumService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public Album saveAlbum(Album album) {
+    public Album saveAlbum(RequestAlbumDto albumDto) {
+        Album album = convertToEntity(albumDto);
         album.setUsers(getAuthenticatedUser());
         if(albumRepository.findAlbumByUsersAndIdSpotify(getAuthenticatedUser(), album.getIdSpotify()).isPresent()){
             throw new IllegalArgsRequestException("Album already purchased");
         }
-        Album albumSaved = albumRepository.save(album);
-        WalletOperationDto walletDto = new WalletOperationDto(albumSaved.getUsers().getEmail(), albumSaved.getValue());
+        album = albumRepository.save(album);
+        WalletOperationDto walletDto = new WalletOperationDto(album.getUsers().getEmail(), album.getValue());
         this.template.convertAndSend(queue.getName(), walletDto);
-        return albumSaved;
+        return album;
     }
-
+    
+    private Album convertToEntity(RequestAlbumDto albumDto) {
+        return Album.builder().name(albumDto.name()).artistName(albumDto.artistName())
+                .idSpotify(albumDto.idSpotify()).imageUrl(albumDto.imageUrl()).value(albumDto.value()).build();
+    }
+    
     private Users getAuthenticatedUser() {
         String username = SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal().toString();

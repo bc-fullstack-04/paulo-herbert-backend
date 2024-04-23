@@ -41,6 +41,7 @@ public class WalletService {
             currentWallet.setBalance(currentWallet.getBalance().add(value));
         else
             throw new IllegalArgsRequestException("Invalid value: "+value);
+        log.info("Updating user credits: {}",currentWallet );
         return new ResponseWalletDto(saveWallet(currentWallet));
     }
 

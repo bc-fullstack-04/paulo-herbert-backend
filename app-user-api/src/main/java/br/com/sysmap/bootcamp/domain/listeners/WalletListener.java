@@ -17,6 +17,7 @@ public class WalletListener {
 
     @RabbitHandler
     public void receive(WalletOperationDto walletDto) {
+        log.info("Received message : debit wallet");
         walletService.debit(walletDto);
     }
 
