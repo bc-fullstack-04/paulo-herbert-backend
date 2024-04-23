@@ -19,7 +19,4 @@ public record RequestAlbumDto(
         BigDecimal value
 
 ) {
-    public RequestAlbumDto(Album album) {
-        this(album.getName(),album.getIdSpotify(),album.getArtistName(),album.getImageUrl(),album.getValue());
-    }
 }
