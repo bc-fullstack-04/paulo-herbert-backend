@@ -1,10 +1,7 @@
 package br.com.sysmap.bootcamp.dto;
 
 import br.com.sysmap.bootcamp.domain.entities.Wallet;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @Getter
+@Setter
 public class ResponseWalletDto {
 
     private Long id;
@@ -26,5 +24,9 @@ public class ResponseWalletDto {
         this.points = wallet.getPoints();
         this.lastUpdate = wallet.getLastUpdate();
         this.user = new ResponseUserDto(wallet.getUsers());
+    }
+
+    public ResponseWalletDto() {
+
     }
 }

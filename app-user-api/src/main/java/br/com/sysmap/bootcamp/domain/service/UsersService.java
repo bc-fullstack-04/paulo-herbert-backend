@@ -8,19 +8,20 @@ import br.com.sysmap.bootcamp.dto.RequestAuthDto;
 import br.com.sysmap.bootcamp.dto.ResponseAuthDto;
 import br.com.sysmap.bootcamp.dto.ResponseUserDto;
 import br.com.sysmap.bootcamp.dto.UserRequestDto;
-import br.com.sysmap.bootcamp.exceptions.IllegalArgsRequestException;
+import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
+import br.com.sysmap.bootcamp.exceptions.customs.InvalidCredentials;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -75,24 +76,24 @@ public class UsersService implements UserDetailsService {
 
     public Users getLoggedUser() {
         String loggedUserName = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return this.usersRepository.findByEmail(loggedUserName).orElseThrow();
+        return this.usersRepository.findByEmail(loggedUserName).orElseThrow(()->new EntityNotFoundException("user not found"));
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = findByEmail(username);
+    public UserDetails loadUserByUsername(String username) {
+        Users user = usersRepository.findByEmail(username).orElseThrow(()->new InvalidCredentials("User not found"));
         return new User(user.getEmail(), user.getPassword(), new ArrayList<GrantedAuthority>());
     }
 
     public Users findByEmail(String email) {
-        return this.usersRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return usersRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found "+email));
     }
 
     public ResponseAuthDto auth(RequestAuthDto requestAuthDto) {
         Users users = this.findByEmail(requestAuthDto.getEmail());
 
         if (!this.passwordEncoder.matches(requestAuthDto.getPassword(), users.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new InvalidCredentials("Invalid password");
         }
 
         String password = users.getEmail().concat(":").concat(users.getPassword());
