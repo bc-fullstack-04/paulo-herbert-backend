@@ -6,6 +6,7 @@ import br.com.sysmap.bootcamp.domain.model.AlbumModel;
 import br.com.sysmap.bootcamp.domain.repository.AlbumRepository;
 import br.com.sysmap.bootcamp.domain.service.integration.SpotifyApiService;
 import br.com.sysmap.bootcamp.dto.WalletOperationDto;
+import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,9 @@ public class AlbumService {
     @Transactional(propagation = Propagation.REQUIRED)
     public Album saveAlbum(Album album) {
         album.setUsers(getAuthenticatedUser());
+        if(albumRepository.findAlbumByUsersAndIdSpotify(getAuthenticatedUser(), album.getIdSpotify()).isPresent()){
+            throw new IllegalArgsRequestException("Album already purchased");
+        }
         Album albumSaved = albumRepository.save(album);
         WalletOperationDto walletDto = new WalletOperationDto(albumSaved.getUsers().getEmail(), albumSaved.getValue());
         this.template.convertAndSend(queue.getName(), walletDto);

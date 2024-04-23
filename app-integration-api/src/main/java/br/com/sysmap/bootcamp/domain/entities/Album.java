@@ -22,7 +22,7 @@ public class Album {
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "id_spotify", nullable = false, length = 100,unique = true)
+    @Column(name = "id_spotify", nullable = false, length = 100)
     private String idSpotify;
 
     @Column(name = "artist_name", nullable = false, length = 150)

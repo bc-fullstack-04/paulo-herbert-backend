@@ -13,5 +13,6 @@ import java.util.Optional;
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     Page<Album> findAllByUsers(Users users, Pageable pageable);
-    Optional<Album> findAlbumByUsersAndId(Users user, Long id);
+    Optional<Album> findAlbumByUsersAndIdSpotify(Users user, String spotifyId);
+    Optional<Album> findAlbumByUsersAndId(Users authenticatedUser, Long id);
 }
