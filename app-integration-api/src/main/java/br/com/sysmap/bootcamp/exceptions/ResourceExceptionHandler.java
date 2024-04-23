@@ -1,0 +1,37 @@
+package br.com.sysmap.bootcamp.exceptions;
+
+import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
+import br.com.sysmap.bootcamp.exceptions.customs.InvalidCredentials;
+import br.com.sysmap.bootcamp.exceptions.customs.StandardError;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.time.Instant;
+
+@ControllerAdvice
+public class ResourceExceptionHandler {
+
+    private final HttpServletRequest http;
+
+    public ResourceExceptionHandler(HttpServletRequest http) {
+        this.http = http;
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<StandardError> handleEntityNotFoundException(EntityNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new StandardError(Instant.now(),HttpStatus.NOT_FOUND.value()
+                        ,"Entity Not Found", e.getMessage(), http.getRequestURI()));
+    }
+
+    @ExceptionHandler(IllegalArgsRequestException.class)
+    public ResponseEntity<StandardError> handleIllegalArgsRequestException(IllegalArgsRequestException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new StandardError(Instant.now(),HttpStatus.BAD_REQUEST.value(), "Illegal Argument in Request", e.getMessage(), http.getRequestURI())
+        );
+    }
+}
