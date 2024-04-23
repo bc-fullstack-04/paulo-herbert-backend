@@ -5,7 +5,9 @@ import br.com.sysmap.bootcamp.domain.repository.UsersRepository;
 import br.com.sysmap.bootcamp.domain.service.UsersService;
 import br.com.sysmap.bootcamp.domain.service.WalletService;
 import br.com.sysmap.bootcamp.dto.*;
+import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -113,6 +115,42 @@ public class UsersControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("John"))
                 .andExpect(jsonPath("$.email").value("emailteste@"));
+    }
+
+    @Test
+    @DisplayName("find by id should return NotFound")
+    public void findByIdShouldReturnNotFound() throws Exception {
+        Long userId = 1L;
+        ResponseUserDto userDto = new ResponseUserDto(1L,"John","emailteste@");
+        when(usersService.findById(userId)).thenThrow(EntityNotFoundException.class);
+        mockMvc.perform(get("/users/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("Entity Not Found"));
+    }
+
+    @Test
+    @DisplayName("Should return 422 when user data is invalid")
+    public void shouldThrowValidationError() throws Exception {
+        Users users = Users.builder().id(1L).name("teste").email("test.com").password("teste").build();
+        when(usersService.create(any(),any())).thenReturn(new ResponseUserDto(users));
+        mockMvc.perform(post("/users/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new UserRequestDto(users))).characterEncoding(Charset.defaultCharset()))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.error").value("Validation Exception"));
+    }
+
+    @Test
+    @DisplayName("Should return Bad Request when user request is invalid")
+    public void shouldThrowIllegalRequest() throws Exception {
+        Users users = Users.builder().id(1L).name("teste").email("test@tt.com").password("teste").build();
+        when(usersService.create(any(),any())).thenThrow(IllegalArgsRequestException.class);
+        mockMvc.perform(post("/users/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new UserRequestDto(users))).characterEncoding(Charset.defaultCharset()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Illegal Argument in Request"));
     }
 }
 
