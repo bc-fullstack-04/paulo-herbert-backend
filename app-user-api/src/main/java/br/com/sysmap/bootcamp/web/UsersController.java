@@ -9,6 +9,7 @@ import br.com.sysmap.bootcamp.dto.ResponseUserDto;
 import br.com.sysmap.bootcamp.dto.UserRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,28 +24,29 @@ public class UsersController {
     private final UsersService usersService;
     private final WalletService walletService;
 
-    @Operation(summary = "Save user")
+    @Operation(summary = "save user")
     @PostMapping("/create")
-    public ResponseEntity<ResponseUserDto> save(@RequestBody UserRequestDto user) {
-        return ResponseEntity.ok(this.usersService.create(user,walletService));
+    public ResponseEntity<ResponseUserDto> save(@ParameterObject @RequestBody UserRequestDto user) {
+        return ResponseEntity.ok(usersService.create(user,walletService));
     }
-
+    @Operation(summary = "auth user")
     @PostMapping("/auth")
-    public ResponseEntity<ResponseAuthDto> auth(@RequestBody RequestAuthDto user) {
-        return ResponseEntity.ok(this.usersService.auth(user));
+    public ResponseEntity<ResponseAuthDto> auth(@ParameterObject @RequestBody RequestAuthDto user) {
+        return ResponseEntity.ok(usersService.auth(user));
     }
-
+    @Operation(summary = "update user")
     @PutMapping("/update")
-    public ResponseEntity<ResponseUserDto> update(@RequestBody UserRequestDto user) {
+    public ResponseEntity<ResponseUserDto> update(@ParameterObject @RequestBody UserRequestDto user) {
         return ResponseEntity.ok(usersService.update(user));
     }
 
-
+    @Operation(summary = "list users")
     @GetMapping
-    public ResponseEntity<Page<ResponseUserDto>> getAll(Pageable pg){
+    public ResponseEntity<Page<ResponseUserDto>> getAll(@ParameterObject Pageable pg){
         return ResponseEntity.ok(usersService.findAll(pg));
     }
 
+    @Operation(summary = "get user by id")
     @GetMapping("/{id}")
     public ResponseEntity<ResponseUserDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(usersService.findById(id));

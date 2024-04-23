@@ -1,5 +1,6 @@
 package br.com.sysmap.bootcamp.config;
 
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +15,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class ServerSecurityConfig {
 
-
+    private SecurityExceptionHandler securityExceptionHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -31,6 +33,7 @@ public class ServerSecurityConfig {
                  "/v2/api-docs.yaml",
                  "/swagger-ui/**", "/swagger-ui.html").permitAll())
                 .authorizeHttpRequests(authorize->authorize.anyRequest().authenticated())
+                .exceptionHandling(ex->ex.authenticationEntryPoint(securityExceptionHandler))
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }
