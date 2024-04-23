@@ -6,6 +6,7 @@ import br.com.sysmap.bootcamp.exceptions.customs.InvalidCredentials;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,5 +30,11 @@ public class UsersService implements UserDetailsService {
 
     public Users findByEmail(String username) {
         return usersRepository.findByEmail(username).orElseThrow(() -> new InvalidCredentials("User not found " + username));
+    }
+
+    public Users getAuthenticatedUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal().toString();
+        return findByEmail(username);
     }
 }

@@ -3,7 +3,6 @@ package br.com.sysmap.bootcamp.dto;
 import br.com.sysmap.bootcamp.domain.entities.Users;
 import lombok.*;
 
-@Builder
 @AllArgsConstructor
 @Getter
 public class ResponseUserDto {

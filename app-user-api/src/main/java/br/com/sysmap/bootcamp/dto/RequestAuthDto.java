@@ -7,7 +7,6 @@ import lombok.*;
 
 @Builder
 @Getter
-@Setter
 @AllArgsConstructor
 public class RequestAuthDto {
 

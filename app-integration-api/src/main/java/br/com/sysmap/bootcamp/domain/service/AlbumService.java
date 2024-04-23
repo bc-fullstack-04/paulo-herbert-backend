@@ -41,19 +41,22 @@ public class AlbumService {
 
     public Page<AlbumModel> getAlbums(String search,Pageable pg) throws IOException, ParseException, SpotifyWebApiException {
         List<AlbumModel> albumList = spotifyApiService.getAlbums(search);
+        log.info("Getting albums");
         return new PageImpl<>(albumList,pg,albumList.size());
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public Album saveAlbum(RequestAlbumDto albumDto) {
         Album album = convertToEntity(albumDto);
-        album.setUsers(getAuthenticatedUser());
-        if(albumRepository.findAlbumByUsersAndIdSpotify(getAuthenticatedUser(), album.getIdSpotify()).isPresent()){
+        album.setUsers(usersService.getAuthenticatedUser());
+        if(albumRepository.findAlbumByUsersAndIdSpotify(album.getUsers(), album.getIdSpotify()).isPresent()){
             throw new IllegalArgsRequestException("Album already purchased");
         }
+        log.info("Saving album: {}", album);
         album = albumRepository.save(album);
         WalletOperationDto walletDto = new WalletOperationDto(album.getUsers().getEmail(), album.getValue());
-        this.template.convertAndSend(queue.getName(), walletDto);
+        template.convertAndSend(queue.getName(), walletDto);
+        log.info("Sending debit from wallet: {}", walletDto);
         return album;
     }
     
@@ -61,19 +64,13 @@ public class AlbumService {
         return Album.builder().name(albumDto.name()).artistName(albumDto.artistName())
                 .idSpotify(albumDto.idSpotify()).imageUrl(albumDto.imageUrl()).value(albumDto.value()).build();
     }
-    
-    private Users getAuthenticatedUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal().toString();
-        return usersService.findByEmail(username);
-    }
 
     public Page<Album> getUserAlbums(Pageable pg) {
-        return albumRepository.findAllByUsers(getAuthenticatedUser(),pg);
+        return albumRepository.findAllByUsers(usersService.getAuthenticatedUser(),pg);
     }
 
     public void delete(Long id) {
-        albumRepository.delete(albumRepository.findAlbumByUsersAndId(getAuthenticatedUser(),id)
+        albumRepository.delete(albumRepository.findAlbumByUsersAndId(usersService.getAuthenticatedUser(),id)
                 .orElseThrow(()-> new EntityNotFoundException("Album Not Found")));
     }
 }
