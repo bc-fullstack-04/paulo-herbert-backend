@@ -1,25 +1,23 @@
 package br.com.sysmap.bootcamp.dto;
 
 import br.com.sysmap.bootcamp.domain.entities.Users;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class UserRequestDto{
+public class UserUpdateRequestDto {
 
-    @NotBlank
+    @NotNull @Positive
+    Long id;
     private String name;
-    @NotBlank @Email
+    @Email
     private String email;
-    @NotEmpty
     private String password;
 
-    public UserRequestDto(Users user) {
+    public UserUpdateRequestDto(Users user) {
+        this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
         this.password = user.getPassword();

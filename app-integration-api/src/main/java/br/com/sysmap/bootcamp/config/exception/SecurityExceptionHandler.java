@@ -1,20 +1,15 @@
 package br.com.sysmap.bootcamp.config.exception;
 
-import br.com.sysmap.bootcamp.exceptions.customs.InvalidCredentials;
 import br.com.sysmap.bootcamp.exceptions.customs.StandardError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.io.IOException;
 import java.time.Instant;
