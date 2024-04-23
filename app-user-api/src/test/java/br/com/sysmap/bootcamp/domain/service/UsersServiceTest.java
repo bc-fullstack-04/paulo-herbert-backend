@@ -2,11 +2,9 @@ package br.com.sysmap.bootcamp.domain.service;
 
 import br.com.sysmap.bootcamp.domain.entities.Users;
 import br.com.sysmap.bootcamp.domain.repository.UsersRepository;
-import br.com.sysmap.bootcamp.dto.RequestAuthDto;
-import br.com.sysmap.bootcamp.dto.ResponseAuthDto;
-import br.com.sysmap.bootcamp.dto.ResponseUserDto;
-import br.com.sysmap.bootcamp.dto.UserRequestDto;
+import br.com.sysmap.bootcamp.dto.*;
 import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
+import br.com.sysmap.bootcamp.exceptions.customs.InvalidCredentials;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -71,42 +69,31 @@ public class UsersServiceTest {
     @Test
     @DisplayName("update Should Throw Exception when user email already exists")
     public void updateShouldThrowExceptionWhenInValidUsers() {
-        UserRequestDto userRequestDto = new UserRequestDto("loggedUser", "test123@mail.com", "teste");
-        Users loggedUser = Users.builder().id(1L).name("loggedUser").email("test@mail.com").password("teste").build();
-        Users existentUser = Users.builder().id(1L).name("existent user").email("test123@mail.com").password("teste").build();
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
+        UserUpdateRequestDto userUpdateRequestDto = new UserUpdateRequestDto(1L,"loggedUser", "test123@mail.com", "teste");
+        Users userToUpdate = Users.builder().id(1L).email("test@mail.com").password("test123").build();
+        Users existentUser = Users.builder().id(2L).name("existent user").email("test123@mail.com").password("teste").build();
 
-        when(usersRepository.findByEmail(userRequestDto.getEmail())).thenReturn(Optional.of(existentUser));
-        when(usersRepository.findByEmail(loggedUser.getEmail())).thenReturn(Optional.of(loggedUser));
-        when(usersRepository.save(any(Users.class))).thenReturn(loggedUser);
-        when(passwordEncoder.encode(any())).thenReturn("encodedMockpassword");
-        when(authentication.getPrincipal()).thenReturn(loggedUser.getEmail());
-        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(usersRepository.findById(userUpdateRequestDto.getId())).thenReturn(Optional.of(userToUpdate));
+        when(usersRepository.findByEmail(userUpdateRequestDto.getEmail())).thenReturn(Optional.of(existentUser));
 
-        assertThrows(IllegalArgsRequestException.class, () -> usersService.update(userRequestDto));
+        verify(usersRepository,never()).save(any());
+        verify(passwordEncoder,never()).encode(any());
+        assertThrows(IllegalArgsRequestException.class, () -> usersService.update(userUpdateRequestDto));
     }
 
     @Test
     @DisplayName("update Should Return Updated userDto when user is valid")
     public void updateShouldReturnUserDtoWhenValidUsers() {
-        Users userRequest = Users.builder().name("user").email("test123@mail.com").password("131718").build();
-        UserRequestDto userRequestDto = new UserRequestDto("user", "test123@mail.com", "teste");
-        Users loggedUser = Users.builder().id(1L).name("loggedUser").email("test@mail.com").password("teste").build();
-        //security
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
-        when(authentication.getPrincipal()).thenReturn(loggedUser.getEmail());
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(usersRepository.findByEmail(userRequestDto.getEmail())).thenReturn(Optional.empty());
-        when(usersRepository.findByEmail(loggedUser.getEmail())).thenReturn(Optional.of(loggedUser));
+        Users userRequest = Users.builder().id(1L).name("user").email("test123@mail.com").password("131718").build();
+        UserUpdateRequestDto userUpdateRequestDto = new UserUpdateRequestDto(1L,"user", "test123@mail.com", "teste");
+        when(usersRepository.findById(userUpdateRequestDto.getId())).thenReturn(Optional.of(userRequest));
+        when(usersRepository.findByEmail(userUpdateRequestDto.getEmail())).thenReturn(Optional.empty());
         when(usersRepository.save(any())).thenReturn(userRequest);
 
-        ResponseUserDto resp = usersService.update(userRequestDto);
-        assertEquals(userRequestDto.getName(), resp.getName());
-        assertEquals(userRequestDto.getEmail(), resp.getEmail());
+        ResponseUserDto resp = usersService.update(userUpdateRequestDto);
+        assertEquals(userUpdateRequestDto.getName(), resp.getName());
+        assertEquals(userUpdateRequestDto.getEmail(), resp.getEmail());
+        assertEquals(userUpdateRequestDto.getId(), resp.getId());
         verify(usersRepository).save(any());
     }
 
@@ -162,10 +149,10 @@ public class UsersServiceTest {
     }
 
     @Test
-    @DisplayName("loadUserByUsernameShould Throw Not Found")
+    @DisplayName("loadUserByUsernameShould Throw InvalidCredentials")
     public void testLoadUserByUsernameUserNotFound() {
         when(usersRepository.findByEmail("notfound@example.com")).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> {
+        assertThrows(InvalidCredentials.class, () -> {
             usersService.loadUserByUsername("notfound@example.com");
         });
     }
@@ -193,7 +180,7 @@ public class UsersServiceTest {
     @Test
     @DisplayName("Auth should Return ResponseAuthDto")
     public void authShouldReturnResponseAuthDtoWhenRightCredentials() {
-        RequestAuthDto req = new RequestAuthDto("teste@example.com", "password");
+        RequestAuthDto req = RequestAuthDto.builder().email("teste@example.com").password("password").build();
         Users existentUser = new Users(1L, "teste", "teste@example.com", "password");
         when(usersRepository.findByEmail(req.getEmail())).thenReturn(Optional.of(existentUser));
         when(passwordEncoder.matches(req.getPassword(), existentUser.getPassword())).thenReturn(true);
@@ -208,7 +195,7 @@ public class UsersServiceTest {
     }
 
     @Test
-    @DisplayName("Auth should throw BadCredentials ")
+    @DisplayName("Auth should throw InvalidCredentials ")
     public void authShouldThrowBadCredentialsWhenInvalidCredentials() {
         RequestAuthDto req = new RequestAuthDto("teste@example.com", "password");
         Users existentUser = new Users(1L, "teste", "teste@example.com", "password");
@@ -216,8 +203,23 @@ public class UsersServiceTest {
         when(passwordEncoder.matches(req.getPassword(), existentUser.getPassword())).thenReturn(false);
         String password = "teste@example.com:password";
         String expectedToken = Base64.getEncoder().withoutPadding().encodeToString(password.getBytes());
-        assertThrows(BadCredentialsException.class, () -> {
+        assertThrows(InvalidCredentials.class, () -> {
             usersService.auth(req);
         });
+    }
+
+    @Test
+    void shouldReturnLoggedUser(){
+        String loggedUserName = "paulo@mail.com";
+        Users user = Users.builder().id(1L).name("Paulo").password("Herbert").email("paulo@mail.com").build();
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(loggedUserName);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(usersRepository.findByEmail(loggedUserName)).thenReturn(Optional.of(user));
+        Users result = usersService.getLoggedUser();
+        assertNotNull(result);
+        assertEquals(loggedUserName, result.getEmail());
     }
 }

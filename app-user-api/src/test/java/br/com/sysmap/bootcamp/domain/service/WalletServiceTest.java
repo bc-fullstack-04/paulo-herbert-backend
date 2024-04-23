@@ -105,7 +105,7 @@ public class WalletServiceTest {
         when(usersService.getLoggedUser()).thenReturn(user);
         when(walletRepository.save(wallet)).thenReturn(wallet);
         when(walletRepository.findByUsers(user)).thenReturn(Optional.of(wallet));
-        assertThrows(IllegalArgumentException.class,()->walletService.insertCredit(BigDecimal.valueOf(0)));
+        assertThrows(IllegalArgsRequestException.class,()->walletService.insertCredit(BigDecimal.valueOf(0)));
     }
 
     @Test
