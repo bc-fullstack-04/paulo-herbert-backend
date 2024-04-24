@@ -1,7 +1,6 @@
 package br.com.sysmap.bootcamp.config;
 
 import br.com.sysmap.bootcamp.config.exception.SecurityExceptionHandler;
-import br.com.sysmap.bootcamp.exceptions.ResourceExceptionHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

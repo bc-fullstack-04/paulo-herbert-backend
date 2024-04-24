@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 @Getter
 public class WalletOperationDto implements Serializable {
 
-    private String userEmail;
-    private BigDecimal price;
+    private final String userEmail;
+    private final BigDecimal price;
 
     public WalletOperationDto(String email, BigDecimal price) {
         this.userEmail = email;

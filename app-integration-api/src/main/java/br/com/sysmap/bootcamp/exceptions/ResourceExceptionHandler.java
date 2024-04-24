@@ -1,11 +1,9 @@
 package br.com.sysmap.bootcamp.exceptions;
 
 import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
-import br.com.sysmap.bootcamp.exceptions.customs.InvalidCredentials;
 import br.com.sysmap.bootcamp.exceptions.customs.StandardError;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

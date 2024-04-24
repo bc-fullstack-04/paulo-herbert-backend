@@ -3,8 +3,6 @@ package br.com.sysmap.bootcamp.dto;
 import br.com.sysmap.bootcamp.domain.entities.Users;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

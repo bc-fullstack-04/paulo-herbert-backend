@@ -1,7 +1,6 @@
 package br.com.sysmap.bootcamp.domain.service;
 
 import br.com.sysmap.bootcamp.domain.entities.Album;
-import br.com.sysmap.bootcamp.domain.entities.Users;
 import br.com.sysmap.bootcamp.domain.model.AlbumModel;
 import br.com.sysmap.bootcamp.domain.repository.AlbumRepository;
 import br.com.sysmap.bootcamp.domain.service.integration.SpotifyApiService;
@@ -17,7 +16,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

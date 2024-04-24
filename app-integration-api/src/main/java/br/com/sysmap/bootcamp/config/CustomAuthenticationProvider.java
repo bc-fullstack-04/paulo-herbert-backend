@@ -1,26 +1,15 @@
 package br.com.sysmap.bootcamp.config;
 
 import br.com.sysmap.bootcamp.domain.service.UsersService;
-import br.com.sysmap.bootcamp.exceptions.customs.InvalidCredentials;
-import br.com.sysmap.bootcamp.exceptions.customs.StandardError;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.time.Instant;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
