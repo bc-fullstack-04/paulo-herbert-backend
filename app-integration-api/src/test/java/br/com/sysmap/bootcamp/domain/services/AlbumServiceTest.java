@@ -12,7 +12,6 @@ import br.com.sysmap.bootcamp.dto.WalletOperationDto;
 import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.hc.core5.http.ParseException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,9 +22,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 
@@ -37,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -54,15 +49,10 @@ public class AlbumServiceTest {
     @Mock
     private AlbumRepository albumRepository;
     @Mock
-    private Authentication authentication;
-    @Mock
     private RabbitTemplate template;
     @Mock
     private Queue queue;
 
-    @BeforeEach
-    void setup(){
-    }
 
     @Test
     @DisplayName("Should return paged albums by text parameter")
