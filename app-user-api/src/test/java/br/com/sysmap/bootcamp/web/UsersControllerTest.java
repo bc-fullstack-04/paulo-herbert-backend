@@ -1,9 +1,7 @@
 package br.com.sysmap.bootcamp.web;
 
 import br.com.sysmap.bootcamp.domain.entities.Users;
-import br.com.sysmap.bootcamp.domain.repository.UsersRepository;
 import br.com.sysmap.bootcamp.domain.service.UsersService;
-import br.com.sysmap.bootcamp.domain.service.WalletService;
 import br.com.sysmap.bootcamp.dto.*;
 import br.com.sysmap.bootcamp.exceptions.customs.IllegalArgsRequestException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
