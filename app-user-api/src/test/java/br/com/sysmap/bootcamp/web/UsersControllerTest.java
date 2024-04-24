@@ -41,12 +41,6 @@ public class UsersControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
-    private WalletService walletService;
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UsersRepository usersRepository;
-
     @Test
     @DisplayName("Should return users when valid users is saved")
     public void shouldReturnUsersWhenValidUsersIsSaved() throws Exception {
@@ -118,7 +112,6 @@ public class UsersControllerTest {
     @DisplayName("find by id should return NotFound")
     public void findByIdShouldReturnNotFound() throws Exception {
         Long userId = 1L;
-        ResponseUserDto userDto = new ResponseUserDto(1L,"John","emailteste@");
         when(usersService.findById(userId)).thenThrow(EntityNotFoundException.class);
         mockMvc.perform(get("/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON))

@@ -16,7 +16,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private final UsersService userDetailsService;
 
-    public CustomAuthenticationProvider(UsersService userDetailsService, ObjectMapper objectMapper, HttpServletRequest req, HttpServletResponse res) {
+    public CustomAuthenticationProvider(UsersService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 

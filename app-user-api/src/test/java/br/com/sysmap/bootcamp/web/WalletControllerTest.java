@@ -28,9 +28,6 @@ public class WalletControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @MockBean
     private WalletService walletService;
 
